@@ -21,8 +21,11 @@ namespace Open_MediaServer
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = "Strateim Open Media Server", Version = "v1"});
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Strateim Open Media Server", Version = "v1" });
             });
+            services.AddSignalR();
+            services.AddRazorPages();
+            services.AddServerSideBlazor();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -34,16 +37,21 @@ namespace Open_MediaServer
                 app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Strateim Open Media Server"); });
             }
 
+            app.UseStaticFiles();
+
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", RequestDelegate);
-                endpoints.MapGet("/404", RequestNotFound);
+                // endpoints.MapGet("/", RequestDelegate);
+                // endpoints.MapGet("/404", RequestNotFound);
                 endpoints.MapGet("/img/{file}", _mediaHandler.HandleRequestImg);
                 endpoints.MapGet("/video/{file}", _mediaHandler.HandleRequestVideo);
                 endpoints.MapGet("/other/{file}", _mediaHandler.HandleRequestOther);
-                endpoints.MapControllers();
+                endpoints.MapRazorPages();
+                endpoints.MapBlazorHub();
+                endpoints.MapFallbackToPage("/_Host");
+                // endpoints.MapControllers();
             });
         }
 
